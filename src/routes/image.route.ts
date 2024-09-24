@@ -13,4 +13,4 @@ ImageRouter.get('/:id', userAuth, ImageController.findById);
 ImageRouter.get('/', userAuth, ImageController.findAll);
 ImageRouter.post('/', userAuth, upload.single('image_url'), ImageController.create);
 ImageRouter.put('/:id', userAuth, ImageController.update);
-ImageRouter.delete('/:id', ImageController.remove);
+ImageRouter.delete('/:id', userAuth, ImageController.remove);
