@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import helmet from 'helmet';
 
 import { UserRouter } from './routes/user.route';
+import { ImageRouter } from './routes/image.route';
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, '..', 'uploads', 'images')));
 app.use(express.static(path.join(__dirname, '..', 'uploads', 'videos')));
 
 app.use('/api/users', UserRouter);
+app.use('/api/images', ImageRouter);
 
 // activate server
 app.listen(port, () => {

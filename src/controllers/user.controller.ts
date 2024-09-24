@@ -6,7 +6,6 @@ import * as dotenv from 'dotenv';
 import { randomBytes } from 'node:crypto';
 import * as jwt from 'jsonwebtoken';
 import * as UserService from '../services/user.service';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 // configurations
 dotenv.config();
@@ -152,6 +151,15 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
     try {
         const body = req.body;
         const id = req.params.id;
+
+        const existingUser = await UserService.findById(parseInt(id));
+
+        if (!existingUser) {
+            return res.status(400).json({
+                success: 0,
+                message: `User with id ${id} not found...`
+            });
+        }
 
         if (req.file) {
             const imageUrl = req.file.filename;

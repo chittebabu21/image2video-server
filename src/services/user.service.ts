@@ -32,7 +32,6 @@ export const findById = async (id: number): Promise<User | null> => {
 export const findByEmailAddress = async (email_address: string): Promise<User | null> => {
     try {
         const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE email_address = ?', [email_address]);
-
         return rows.length ? (rows[0] as User) : null;
     } catch (err) {
         const mysqlError = err as MysqlError;
@@ -44,7 +43,6 @@ export const findByEmailAddress = async (email_address: string): Promise<User | 
 export const findByVerificationToken = async (verification_token: string): Promise<User | null> => {
     try {
         const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE verification_token = ?', [verification_token]);
-
         return rows.length ? (rows[0] as User) : null;
     } catch (err) {
         const mysqlError = err as MysqlError;
@@ -62,7 +60,6 @@ export const create = async (newUser: { email_address: string; password_hash: st
 
         // get the inserted row by id
         const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE user_id = LAST_INSERT_ID()');
-
         return rows.length ? (rows[0] as User) : null;
     } catch (err) {
         const mysqlError = err as MysqlError;
