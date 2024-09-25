@@ -38,6 +38,20 @@ export const findByImageId = async (id: number): Promise<Video[] | null> => {
     }
 }
 
+export const findByImageIdWithUser = async (id: number): Promise<any | null> => {
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>(
+            'SELECT * FROM videos LEFT JOIN images ON videos.image_id = images.image_id LEFT JOIN users ON images.user_id = users.user_id WHERE videos.image_id = ?',
+            [id]
+        );
+        return rows.length ? rows[0] : null;
+    } catch (err: any) {
+        const mysqlError = err as MysqlError;
+        console.log(`Error in fetching video: ${mysqlError.message}`);
+        return null;
+    }
+}
+
 export const create = async (newVideo: { video_url: string; generation_id: string; image_id: number; }): Promise<Video | null> => {
     try {
         const [result] = await pool.query<RowDataPacket[]>(
