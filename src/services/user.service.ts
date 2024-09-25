@@ -20,7 +20,6 @@ export const findAll = async (): Promise<User[] | null> => {
 export const findById = async (id: number): Promise<User | null> => {
     try {
         const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE user_id = ?', [id]);
-
         return rows.length ? (rows[0] as User) : null;
     } catch (err: any) {
         const mysqlError = err as MysqlError;
