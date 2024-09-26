@@ -1,22 +1,22 @@
 // imports 
 import { Request, Response } from 'express';
-import * as ImageService from '../services/image.service';
+import * as DownloadService from '../services/download.service';
 
 // controller methods
 export const findAll = async (req: Request, res: Response): Promise<Response> => {
     try {
-        const images = await ImageService.findAll();
+        const downloads = await DownloadService.findAll();
 
-        if (!images || images.length === 0) {
+        if (!downloads || downloads.length === 0) {
             return res.status(400).json({
                 success: 0,
-                message: 'Images not found...'
+                message: 'Downloads not found...'
             });
         }
 
         return res.status(200).json({
             success: 1,
-            data: images
+            data: downloads
         });
     } catch (err) {
         const error = err as Error;
@@ -33,18 +33,18 @@ export const findById = async (req: Request, res: Response): Promise<Response> =
     try {
         const id = req.params.id;
 
-        const image = await ImageService.findById(parseInt(id));
+        const download = await DownloadService.findById(parseInt(id));
 
-        if (!image) {
+        if (!download) {
             return res.status(400).json({
                 success: 0,
-                message: 'Image not found...'
+                message: 'Download not found...'
             });
         }
 
         return res.status(200).json({
             success: 1,
-            data: image
+            data: download
         });
     } catch (err) {
         const error = err as Error;
@@ -57,22 +57,22 @@ export const findById = async (req: Request, res: Response): Promise<Response> =
     }
 }
 
-export const findByUserId = async (req: Request, res: Response): Promise<Response> => {
+export const findByVideoId = async (req: Request, res: Response): Promise<Response> => {
     try {
         const id = req.params.id;
 
-        const images = await ImageService.findByUserId(parseInt(id));
+        const download = await DownloadService.findByVideoId(parseInt(id));
 
-        if (!images) {
+        if (!download) {
             return res.status(400).json({
                 success: 0,
-                message: `Images for user with user id ${id} not found...`
+                message: 'Download not found...'
             });
         }
 
         return res.status(200).json({
             success: 1,
-            data: images
+            data: download
         });
     } catch (err) {
         const error = err as Error;
@@ -89,30 +89,25 @@ export const create = async (req: Request, res: Response): Promise<Response> => 
     try {
         const body = req.body;
 
-        if (!body.user_id) {
+        if (!body.video_id) {
             return res.status(400).json({
                 success: 0,
-                message: 'User id is required...'
+                message: 'Video id is required...'
             });
         }
 
-        if (req.file) {
-            const imageUrl = req.file.filename;
-            body.image_url = imageUrl;
-        }
+        const download = await DownloadService.create(body);
 
-        const image = await ImageService.create(body);
-
-        if (!image) {
+        if (!download) {
             return res.status(400).json({
                 success: 0,
-                message: 'Unable to create image...'
-            }); 
+                message: 'Unable to create download...'
+            });
         }
 
         return res.status(200).json({
-            success: 1,
-            data: image
+            success: 0,
+            data: download
         });
     } catch (err) {
         const error = err as Error;
@@ -125,39 +120,34 @@ export const create = async (req: Request, res: Response): Promise<Response> => 
     }
 }
 
-export const update = async (req: Request, res: Response): Promise<Response> => {
+export const update = async (req: Request, res: Response): Promise<Response> =>{
     try {
         const body = req.body;
         const id = req.params.id;
 
-        if (req.file) {
-            const imageUrl = req.file.filename;
-            body.image_url = imageUrl;
-        }
+        const existingDownload = await DownloadService.findById(parseInt(id));
 
-        const existingImage = await ImageService.findById(parseInt(id));
-
-        if (!existingImage) {
+        if (!existingDownload) {
             return res.status(400).json({
                 success: 0,
-                message: `Image with id ${id} not found...`
+                message: 'Download not found...'
             });
         }
 
-        const image = await ImageService.update(parseInt(id), body);
+        const download = await DownloadService.update(parseInt(id), body);
 
-        if (!image) {
+        if (!download) {
             return res.status(400).json({
                 success: 0,
-                message: 'Unable to update image...'
+                message: 'Unable to update download...'
             });
         }
 
         return res.status(200).json({
             success: 1,
-            data: image
+            data: download
         });
-    } catch (err) {
+    }  catch (err) {
         const error = err as Error;
         console.log(error);
 
@@ -172,20 +162,20 @@ export const remove = async (req: Request, res: Response): Promise<Response> => 
     try {
         const id = req.params.id;
 
-        const existingImage = await ImageService.findById(parseInt(id));
+        const existingDownload = await DownloadService.findById(parseInt(id));
 
-        if (!existingImage) {
+        if (!existingDownload) {
             return res.status(400).json({
                 success: 0,
-                message: `Image with id ${id} not found...`
+                message: 'Download not found...'
             });
         }
 
-        await ImageService.remove(parseInt(id));
+        await DownloadService.remove(parseInt(id));
 
         return res.status(200).json({
             success: 1,
-            message: 'Image removed successfully!'
+            message: 'Download removed successfully!'
         });
     } catch (err) {
         const error = err as Error;
