@@ -44,7 +44,7 @@ export const findByImageIdWithUser = async (id: number): Promise<any | null> => 
             'SELECT * FROM videos LEFT JOIN images ON videos.image_id = images.image_id LEFT JOIN users ON images.user_id = users.user_id WHERE videos.image_id = ?',
             [id]
         );
-        return rows.length ? rows[0] : null;
+        return rows;
     } catch (err: any) {
         const mysqlError = err as MysqlError;
         console.log(`Error in fetching video: ${mysqlError.message}`);

@@ -7,6 +7,7 @@ import helmet from 'helmet';
 
 import { UserRouter } from './routes/user.route';
 import { ImageRouter } from './routes/image.route';
+import { VideoRouter } from './routes/video.route';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use(express.static(path.join(__dirname, '..', 'uploads', 'videos')));
 
 app.use('/api/users', UserRouter);
 app.use('/api/images', ImageRouter);
+app.use('/api/videos', VideoRouter);
 
 // activate server
 app.listen(port, () => {

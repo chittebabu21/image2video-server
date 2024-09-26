@@ -1,5 +1,5 @@
 // imports 
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import * as dotenv from 'dotenv';
 import * as ImageService from '../services/image.service';
 
