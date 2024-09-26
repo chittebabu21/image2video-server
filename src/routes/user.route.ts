@@ -9,7 +9,7 @@ export const UserRouter = express.Router();
 
 // routes
 UserRouter.get('/verify_user/:token', UserController.verifyEmail);
-UserRouter.get('/user', UserController.findByEmailAddress);
+UserRouter.get('/user/', UserController.findByEmailAddress);
 UserRouter.get('/:id', UserController.findById);
 UserRouter.get('/', UserController.findAll);
 UserRouter.post('/reset_password_request', UserController.sendResetPasswordLink);
