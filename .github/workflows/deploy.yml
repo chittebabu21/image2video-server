@@ -5,7 +5,7 @@ on:
         branches: main
         paths-ignore: './github/workflows/*'
 env: 
-    PORT: ${{ secrets.PORT }}
+    PORT: 4000
 jobs:
     test:
         environment: Testing
