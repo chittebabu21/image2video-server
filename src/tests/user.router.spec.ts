@@ -36,7 +36,7 @@ describe('User API Endpoints', () => {
 
     it('POST /api/users should create a new user', async () => {
         const newUser = {
-            email_address: 'test-5@email.com',
+            email_address: 'test-6@email.com',
             password_hash: 'Singapore25'
         };
 
