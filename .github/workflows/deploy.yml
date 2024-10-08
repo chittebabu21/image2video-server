@@ -12,15 +12,15 @@ jobs:
         runs-on: ubuntu-latest
         container:
             image: node:20
-        # services:
-        #     mysqldb:
-        #         image: mysql
-        #         env:
-        #             MYSQL_HOSTNAME: ${{ secrets.MYSQL_HOSTNAME }}
-        #             MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        #             MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
-        #             MYSQL_DB: ${{ secrets.MYSQL_DB }}
-        #             MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+        services:
+            mysqldb:
+                image: mysql
+                env:
+                    MYSQL_HOSTNAME: ${{ secrets.MYSQL_HOSTNAME }}
+                    MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+                    MYSQL_USERNAME: ${{ secrets.MYSQL_USERNAME }}
+                    MYSQL_DB: ${{ secrets.MYSQL_DB }}
+                    MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
         steps:
             - name: Get code
               uses: actions/checkout@v4

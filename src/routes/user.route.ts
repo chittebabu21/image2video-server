@@ -14,6 +14,7 @@ UserRouter.get('/:id', UserController.findById);
 UserRouter.get('/', UserController.findAll);
 UserRouter.post('/reset_password_request', UserController.sendResetPasswordLink);
 UserRouter.post('/verify_email_request', UserController.sendVerificationLink);
+UserRouter.post('/oauth_user', UserController.createOAuthUser);
 UserRouter.post('/login', UserController.login);
 UserRouter.post('/', UserController.create);
 UserRouter.put('/update_password', UserController.updatePassword);

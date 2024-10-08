@@ -82,7 +82,7 @@ export const findByEmailAddress = async (req: Request, res: Response): Promise<R
         if (!user) {
             return res.status(400).json({
                 success: 0,
-                message: 'User not found...'
+                message: 'User with email address not found...'
             }); 
         }
 
@@ -135,6 +135,64 @@ export const create = async (req: Request, res: Response): Promise<Response> => 
         return res.status(200).json({
             success: 1,
             data: user
+        });
+    } catch (err) {
+        const error = err as Error;
+        console.log(error);
+
+        return res.status(500).json({
+            success: 0, 
+            error: error.message
+        });
+    }
+}
+
+export const createOAuthUser = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const body = req.body;
+
+        if (!body.email_address || !body.password_hash || !body.is_verified) {
+            return res.status(400).json({
+                success: 0,
+                message: 'Parameters are required...'
+            });
+        }
+
+        const existingUser = await UserService.findByEmailAddress(body.email_address);
+
+        if (existingUser) {
+            return res.status(409).json({
+                success: 0,
+                message: 'User with email address already exists...'
+            });
+        }
+
+        const hash = await brcrypt.hash(body.password_hash, 10);
+
+        if (!hash) {
+            return res.status(400).json({
+                success: 0,
+                message: 'Unable to encrypt password...'
+            });
+        }
+
+        const oAuthUser = await UserService.createOAuthUser({ 
+            email_address: body.email_address, 
+            password_hash: hash, 
+            profile_image_url: body.profile_image_url,
+            is_verified: body.is_verified
+        });
+
+        if (!oAuthUser) {
+            return res.status(400).json({
+                success: 0,
+                message: 'Unable to create user...'
+            }); 
+        }
+
+        return res.status(200).json({
+            success: 1,
+            data: oAuthUser
         });
     } catch (err) {
         const error = err as Error;

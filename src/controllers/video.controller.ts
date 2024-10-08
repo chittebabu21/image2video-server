@@ -126,7 +126,7 @@ export const getGeneratedVideo = async (req: Request, res: Response): Promise<Re
     try {
         const body = req.body;
 
-        if (!body.generation_id || !body.image_id) {
+        if (!body.generation_id) {
             return res.status(400).json({
                 success: 0,
                 message: 'Parameters missing...'
@@ -209,8 +209,14 @@ export const generateVideo = async (req: Request, res: Response): Promise<Respon
         const width = parseInt(body.width);
         const height = parseInt(body.height);
 
-        const imagePath = path.join(__dirname, '..', req.file.path);
-        const resizedImagePath = path.join(__dirname, '..', 'uploads', `resized-${req.file.filename}.png`);
+        const imagePath = path.join(__dirname, '..', '..', req.file.path);
+        const resizedImagePath = path.join(__dirname, '..', '..', 'uploads', 'images', `resized-${req.file.filename}`);
+
+        console.log(resizedImagePath);
+
+        if (!fs.existsSync(path.join(__dirname, '..', '..', 'uploads', 'images'))) {
+            fs.mkdirSync(path.join(__dirname, '..', '..', 'uploads', 'images'), { recursive: true });
+        }
 
         await sharp(imagePath)
             .resize(width, height, { fit: 'cover' })
@@ -221,6 +227,8 @@ export const generateVideo = async (req: Request, res: Response): Promise<Respon
         data.append('seed', 0);
         data.append('cfg_scale', 1.8);
         data.append('motion_bucket_id', 127);
+
+        console.log(data);
 
         const response: AxiosResponse = await axios.request({
             url: process.env.STABILITY_AI_URL,

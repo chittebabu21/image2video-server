@@ -67,6 +67,22 @@ export const create = async (newUser: { email_address: string; password_hash: st
     }
 }
 
+export const createOAuthUser = async (oAuthUser: { email_address: string; password_hash: string; profile_image_url: string; is_verified: 0 | 1}): Promise<User | null> => {
+    try {
+        const [result] = await pool.query<RowDataPacket[]>(
+            'INSERT INTO users (email_address, password_hash, profile_image_url, is_verified) VALUES (?, ?, ?, ?)',
+            [oAuthUser.email_address, oAuthUser.password_hash, oAuthUser.profile_image_url, oAuthUser.is_verified]
+        );
+
+        const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE user_id = LAST_INSERT_ID()');
+        return rows.length ? (rows[0] as User) : null;
+    } catch (err) {
+        const mysqlError = err as MysqlError;
+        console.log(`Error in creating OAuth user: ${mysqlError.message}`);
+        return null;
+    }
+}
+
 export const update = async (
     id: number, 
     userUpdate: { 
