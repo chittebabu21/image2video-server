@@ -160,8 +160,10 @@ export const getGeneratedVideo = async (req: Request, res: Response): Promise<Re
 
         fs.writeFileSync(`uploads/videos/${body.generation_id}.mp4`, Buffer.from(response.data));
 
+        const formattedVideoUrl = body.generation_id.replace(/[a-z]/gi, ''); // removes all alphabets /[a-z]/gi -> case insensitive
+
         const video = await VideoService.create({ 
-            video_url: `${body.generation_id}.mp4`, 
+            video_url: `${formattedVideoUrl}.mp4`, 
             generation_id: body.generation_id,
             image_id: body.image_id
         });
@@ -212,8 +214,6 @@ export const generateVideo = async (req: Request, res: Response): Promise<Respon
         const imagePath = path.join(__dirname, '..', '..', req.file.path);
         const resizedImagePath = path.join(__dirname, '..', '..', 'uploads', 'images', `resized-${req.file.filename}`);
 
-        console.log(resizedImagePath);
-
         if (!fs.existsSync(path.join(__dirname, '..', '..', 'uploads', 'images'))) {
             fs.mkdirSync(path.join(__dirname, '..', '..', 'uploads', 'images'), { recursive: true });
         }
@@ -227,8 +227,6 @@ export const generateVideo = async (req: Request, res: Response): Promise<Respon
         data.append('seed', 0);
         data.append('cfg_scale', 1.8);
         data.append('motion_bucket_id', 127);
-
-        console.log(data);
 
         const response: AxiosResponse = await axios.request({
             url: process.env.STABILITY_AI_URL,
