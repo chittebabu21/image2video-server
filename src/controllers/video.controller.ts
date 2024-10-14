@@ -126,44 +126,65 @@ export const getGeneratedVideo = async (req: Request, res: Response): Promise<Re
     try {
         const body = req.body;
 
-        if (!body.generation_id) {
+        if (!body.generation_id || !body.image_id) {
             return res.status(400).json({
                 success: 0,
                 message: 'Parameters missing...'
             });
         }
 
-        const response: AxiosResponse = await axios.request({
-            url: `${process.env.STABILITY_AI_URL}/result/${body.generation_id}`,
-            method: 'GET',
-            validateStatus: undefined,
-            responseType: 'arraybuffer',
-            headers: {
-                Authorization: `Bearer ${process.env.STABILITY_AI_API_KEY}`,
-                Accept: 'video/*'
-            }
-        });
+        // Polling function to check video status
+        const checkVideoStatus = async (): Promise<AxiosResponse> => {
+            return axios.request({
+                url: `${process.env.STABILITY_AI_URL}/result/${body.generation_id}`,
+                method: 'GET',
+                validateStatus: undefined,
+                responseType: 'arraybuffer',
+                headers: {
+                    Authorization: `Bearer ${process.env.STABILITY_AI_API_KEY}`,
+                    Accept: 'video/*'
+                }
+            });
+        };
 
-        if (response.status === 500) {
+        let response: AxiosResponse;
+        const MAX_RETRIES = 10; // Set a limit on retries to avoid endless polling
+        const POLLING_INTERVAL = 5000; // 5 seconds between checks
+        let retries = 0;
+
+        // Poll the Stability API until we get a 200 status or hit the retry limit
+        do {
+            response = await checkVideoStatus();
+
+            if (response.status === 202) {
+                console.log('Video generation in progress, retrying...');
+                await new Promise(resolve => setTimeout(resolve, POLLING_INTERVAL)); // Wait before retrying
+                retries++;
+            } else if (response.status === 200) {
+                break; // Video is ready
+            } else {
+                return res.status(response.status).json({
+                    success: 0,
+                    error: `Response ${response.status}: ${response.data}`
+                });
+            }
+        } while (retries < MAX_RETRIES);
+
+        // If we exhausted retries and still have a 202 status, return an error
+        if (response.status !== 200) {
             return res.status(500).json({
                 success: 0,
-                error: `Response ${response.status}: ${response.data}`
+                message: 'Video generation timed out or failed.'
             });
         }
 
-        if (response.status === 202) {
-            return res.status(202).json({
-                success: 1,
-                message: 'Video generation in process.'
-            });
-        }
+        // Write the video to the file system
+        const videoFilePath = `uploads/videos/${body.generation_id}.mp4`;
+        fs.writeFileSync(videoFilePath, Buffer.from(response.data));
 
-        fs.writeFileSync(`uploads/videos/${body.generation_id}.mp4`, Buffer.from(response.data));
-
-        const formattedVideoUrl = body.generation_id.replace(/[a-z]/gi, ''); // removes all alphabets /[a-z]/gi -> case insensitive
-
+        // Create the video entry in the database
         const video = await VideoService.create({ 
-            video_url: `${formattedVideoUrl}.mp4`, 
+            video_url: `${body.generation_id}.mp4`, 
             generation_id: body.generation_id,
             image_id: body.image_id
         });
@@ -177,18 +198,19 @@ export const getGeneratedVideo = async (req: Request, res: Response): Promise<Re
 
         return res.status(200).json({
             success: 1,
+            message: 'Video created successfully!',
             data: video
         });
     } catch (err) {
         const error = err as Error;
-        console.log(error);
+        console.error(error);
 
         return res.status(500).json({
             success: 0,
             error: error.message
         });
     }
-}
+};
 
 export const generateVideo = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -207,6 +229,8 @@ export const generateVideo = async (req: Request, res: Response): Promise<Respon
                 message: 'Image parameters are missing...'
             });
         }
+
+        console.log(req.file);
 
         const width = parseInt(body.width);
         const height = parseInt(body.height);

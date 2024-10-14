@@ -22,8 +22,15 @@ const app = express();
 
 // configurations
 app.use(express.json());
-app.use(cors());
 app.use(helmet());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+// static sites
 app.use(express.static(path.join(__dirname, '..', 'uploads', 'images')));
 app.use(express.static(path.join(__dirname, '..', 'uploads', 'videos')));
 
