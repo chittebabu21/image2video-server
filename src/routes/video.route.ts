@@ -8,8 +8,7 @@ import * as VideoController from '../controllers/video.controller';
 export const VideoRouter = express.Router();
 
 // routes
-VideoRouter.get('/image/user/:id', userAuth, VideoController.findByImageIdWithUser);
-VideoRouter.get('/image/:id', userAuth, VideoController.findByImageId);
+VideoRouter.get('/user/:id', userAuth, VideoController.findByUserId);
 VideoRouter.get('/:id', userAuth, VideoController.findById);
 VideoRouter.get('/', userAuth, VideoController.findAll);
 VideoRouter.post('/generate', userAuth, upload.single('image'), VideoController.generateVideo);

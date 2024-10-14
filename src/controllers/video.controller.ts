@@ -66,39 +66,11 @@ export const findById = async (req: Request, res: Response): Promise<Response> =
     }
 }
 
-export const findByImageId = async (req: Request, res: Response): Promise<Response> => {
+export const findByUserId = async (req: Request, res: Response): Promise<Response> => {
     try {
         const id = req.params.id;
 
-        const videos = await VideoService.findByImageId(parseInt(id));
-
-        if (!videos) {
-            return res.status(400).json({
-                success: 0,
-                message: 'Videos not found...'
-            });
-        }
-
-        return res.status(200).json({
-            success: 1,
-            data: videos
-        });
-    } catch (err) {
-        const error = err as Error;
-        console.log(error);
-
-        return res.status(500).json({
-            success: 0,
-            error: error.message
-        });
-    }
-}
-
-export const findByImageIdWithUser = async (req: Request, res: Response): Promise<Response> => {
-    try {
-        const id = req.params.id;
-
-        const videos = await VideoService.findByImageIdWithUser(parseInt(id));
+        const videos = await VideoService.findByUserId(parseInt(id));
 
         if (!videos) {
             return res.status(400).json({
@@ -126,7 +98,7 @@ export const getGeneratedVideo = async (req: Request, res: Response): Promise<Re
     try {
         const body = req.body;
 
-        if (!body.generation_id || !body.image_id) {
+        if (!body.generation_id || !body.user_id) {
             return res.status(400).json({
                 success: 0,
                 message: 'Parameters missing...'
@@ -186,7 +158,7 @@ export const getGeneratedVideo = async (req: Request, res: Response): Promise<Re
         const video = await VideoService.create({ 
             video_url: `${body.generation_id}.mp4`, 
             generation_id: body.generation_id,
-            image_id: body.image_id
+            user_id: body.user_id
         });
 
         if (!video) {

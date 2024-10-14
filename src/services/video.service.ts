@@ -27,9 +27,9 @@ export const findById = async (id: number): Promise<Video | null> => {
     }
 }
 
-export const findByImageId = async (id: number): Promise<Video[] | null> => {
+export const findByUserId = async (id: number): Promise<Video[] | null> => {
     try {
-        const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM videos WHERE image_id = ?', [id]);
+        const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM videos WHERE user_id = ?', [id]);
         return rows as Video[];
     } catch (err: any) {
         const mysqlError = err as MysqlError;
@@ -38,25 +38,11 @@ export const findByImageId = async (id: number): Promise<Video[] | null> => {
     }
 }
 
-export const findByImageIdWithUser = async (id: number): Promise<any | null> => {
-    try {
-        const [rows] = await pool.query<RowDataPacket[]>(
-            'SELECT * FROM videos LEFT JOIN images ON videos.image_id = images.image_id LEFT JOIN users ON images.user_id = users.user_id WHERE videos.image_id = ?',
-            [id]
-        );
-        return rows;
-    } catch (err: any) {
-        const mysqlError = err as MysqlError;
-        console.log(`Error in fetching video: ${mysqlError.message}`);
-        return null;
-    }
-}
-
-export const create = async (newVideo: { video_url: string; generation_id: string; image_id: number; }): Promise<Video | null> => {
+export const create = async (newVideo: { video_url: string; generation_id: string; user_id: number; }): Promise<Video | null> => {
     try {
         const [result] = await pool.query<RowDataPacket[]>(
-            'INSERT INTO videos (video_url, generation_id, image_id) VALUES (?, ?, ?)',
-            [newVideo.video_url, newVideo.generation_id, newVideo.image_id]
+            'INSERT INTO videos (video_url, generation_id, user_id) VALUES (?, ?, ?)',
+            [newVideo.video_url, newVideo.generation_id, newVideo.user_id]
         );
         console.log(result);
 

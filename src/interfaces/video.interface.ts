@@ -1,5 +1,5 @@
 // imports
-import { Image } from "./image.interface";
+import { User } from "./user.interface";
 
 // video interface
 export interface Video {
@@ -7,6 +7,6 @@ export interface Video {
     video_url: string;
     generation_id: string;
     generated_on: Date;
-    image_id: number;
-    image?: Image;
+    user_id: number;
+    user?: User;
 }
