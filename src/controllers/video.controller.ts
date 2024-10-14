@@ -298,7 +298,18 @@ export const remove = async (req: Request, res: Response): Promise<Response> => 
             });
         }
 
+        // construct full path of video file
+        const videoFilePath = path.join(__dirname, '../../uploads/videos', existingVideo.video_url);
+
         await VideoService.remove(parseInt(id));
+
+        // check if file exist in videos folder and remove it
+        if (fs.existsSync(videoFilePath)) {
+            fs.unlinkSync(videoFilePath);
+            console.log(`Video file ${videoFilePath} deleted successfully!`);
+        } else {
+            console.log(`Video file not found: ${videoFilePath}`);
+        }
 
         return res.status(200).json({
             success: 1, 

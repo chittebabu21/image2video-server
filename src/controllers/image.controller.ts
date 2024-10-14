@@ -1,5 +1,7 @@
 // imports 
 import { Request, Response } from 'express';
+import path from 'path';
+import fs from 'fs';
 import * as ImageService from '../services/image.service';
 
 // controller methods
@@ -181,7 +183,17 @@ export const remove = async (req: Request, res: Response): Promise<Response> => 
             });
         }
 
+        // construct full path of the image file
+        const imageFilePath = path.join(__dirname, '../../uploads/images', existingImage.image_url);
+
         await ImageService.remove(parseInt(id));
+
+        if (fs.existsSync(imageFilePath)) {
+            fs.unlinkSync(imageFilePath);
+            console.log(`Image file ${imageFilePath} deleted successfully!`);
+        } else {
+            console.log(`Image file not found: ${imageFilePath}`);
+        }
 
         return res.status(200).json({
             success: 1,
