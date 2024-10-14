@@ -1,9 +1,9 @@
 name: Test & Deploy
 on: 
     workflow_dispatch:
-    push:
-        branches: main
-        paths-ignore: './github/workflows/*'
+    # push:
+    #     branches: main
+    #     paths-ignore: './github/workflows/*'
 env: 
     PORT: ${{ secrets.PORT }}
 jobs:
