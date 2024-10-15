@@ -202,8 +202,6 @@ export const generateVideo = async (req: Request, res: Response): Promise<Respon
             });
         }
 
-        console.log(req.file);
-
         const width = parseInt(body.width);
         const height = parseInt(body.height);
 
