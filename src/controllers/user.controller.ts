@@ -381,7 +381,51 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
             success: 0, 
             message: 'Invalid password...'
         });
+    } catch (err) {
+        const error = err as Error;
+        console.log(error);
 
+        return res.status(500).json({
+            success: 0, 
+            error: error.message
+        });
+    }
+}
+
+export const comparePasswords = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const id = req.params.id;
+        const passwordHash = req.body.password_hash;
+
+        if (!passwordHash) {
+            return res.status(400).json({
+                success: 0,
+                message: 'Password is required...'
+            });
+        }
+
+        const user = await UserService.findById(parseInt(id, 10));
+
+        if (!user) {
+            return res.status(400).json({
+                success: 0,
+                message: 'User not found...'
+            }); 
+        }
+
+        const passwordMatch = await brcrypt.compare(passwordHash, user.password_hash); // first parameter for plain text and second parameter for hash
+
+        if (passwordMatch) {
+            return res.status(200).json({
+                success: 1,
+                message: 'Matching passwords!'
+            });
+        }
+
+        return res.status(401).json({
+            success: 0, 
+            message: 'Invalid password...'
+        });
     } catch (err) {
         const error = err as Error;
         console.log(error);

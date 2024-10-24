@@ -20,5 +20,6 @@ UserRouter.post('/', UserController.create);
 UserRouter.put('/update_password', UserController.updatePassword);
 
 // routes with authorization
+UserRouter.post('/validate-password/:id', userAuth, UserController.comparePasswords);
 UserRouter.put('/:id', userAuth, upload.single('profile_image_url'), UserController.update);
 UserRouter.delete('/:id', userAuth, UserController.remove);
