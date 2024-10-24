@@ -11,7 +11,8 @@ import * as UserService from '../services/user.service';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    service: 'Hotmail',
+    host: 'mail.privateemail.com',
+    secure: true,
     auth: {
         user: process.env.TRANSPORT_EMAIL,
         pass: process.env.TRANSPORT_PASSWORD
